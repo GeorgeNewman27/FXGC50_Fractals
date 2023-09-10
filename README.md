@@ -1,5 +1,5 @@
 # FXGC50_Fractals
-#### Video Demo:  <URL HERE>
+#### Video Demo:  [<URL HERE>](https://youtu.be/5p79SPMUN5Y)
 #### Description:
 
 The Mandelbrot set, probably one of the most iconic images in all of mathematics. A complex and infinitely intricate fractal shape, it emerges from a deceptively simple mathematical formula: Z_n+1 = (Z_n)^2 + c, where Z_0 = 0+0i and c is (x_pixel) + (y_pixel)i. The set is defined by iteratively applying this formula, determining whether they remain bounded or escape to infinity based on the variable starting conditions. The black areas on this set are where the iterative formula converges to a point, and then the colour outside depends on the number of iterations to determine whether it will diverge to infinity. My aim for this project was to render an image of this classic representation of chaos theory on my FXCG-50 graphical calculator. Having a strong background in complex numbers, I was very confident in my ability to code the maths in this project. The main challenge was making all of this work on a calculator... 
