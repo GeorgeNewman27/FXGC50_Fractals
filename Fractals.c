@@ -110,6 +110,16 @@ int getColor(int iterations, int maxIterations)
 void getInfo()
 {
     Bdisp_AllClr_VRAM();
+
+    // Setup header
+    char color1 = TEXT_COLOR_WHITE;
+    char color2 = TEXT_COLOR_WHITE;
+    char msg[12] = "Information";
+    DefineStatusMessage(&msg[0], 0, TEXT_COLOR_BLACK, 0);
+    DefineStatusAreaFlags(4, SAF_BATTERY | SAF_TEXT | SAF_ALPHA_SHIFT, &color1, &color2);
+    EnableDisplayHeader(2, 2);
+
+    DefineStatusAreaFlags(4, SAF_BATTERY | SAF_TEXT | SAF_ALPHA_SHIFT, &color1, &color2);
     PrintXY(1, 1, "  GitHub Name:", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
     PrintXY(1, 2, "  GeorgeNewman27", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
     PrintXY(1, 4, "  GitHub Repo:", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
@@ -138,7 +148,18 @@ void getInfo()
 void editSettings()
 {
     Bdisp_AllClr_VRAM();
+    
+    // Setup header
+    char color1 = TEXT_COLOR_WHITE;
+    char color2 = TEXT_COLOR_WHITE;
+    char msg[9] = "Settings";
+    DefineStatusMessage(&msg[0], 0, TEXT_COLOR_BLACK, 0);
+    DefineStatusAreaFlags(4, SAF_BATTERY | SAF_TEXT | SAF_ALPHA_SHIFT, &color1, &color2);
+    EnableDisplayHeader(2, 2);
+
+    
     // Prints appropriate trace status
+    EnableDisplayHeader(2, 2);
     if (TRACE == 0)
     {
         PrintXY(1, 1, "  F1: Trace = OFF", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
@@ -308,25 +329,37 @@ void renderMandlebrot()
     //Clear VRAM ready to write to
     Bdisp_AllClr_VRAM();
 
+    // Setup header
+    char color1 = TEXT_COLOR_WHITE;
+    char color2 = TEXT_COLOR_WHITE;
+    char msg[11] = "Mandelbrot";
+    DefineStatusMessage(&msg[0], 0, TEXT_COLOR_BLACK, 0);
+    DefineStatusAreaFlags(4, SAF_BATTERY | SAF_TEXT | SAF_ALPHA_SHIFT, &color1, &color2);
+    DisplayStatusArea();
+
     if (LIVE_RENDER == 0)
     {
         PrintXY(7, 4, "  Rendering...", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
-        Bdisp_PutDisp_DD();
     }
 
+    Bdisp_PutDisp_DD();
+
     // Iterate over each pixel on screen
-    for (unsigned int y = 0; y < HEIGHT; y++)
+    for (unsigned int y = 24; y <= HEIGHT; y++)
     {
-        for (unsigned int x = 0; x < WIDTH; x++)
+        for (unsigned int x = 0; x <= WIDTH; x++)
         {
             mandlebrotPixel(x, y);
         }
 
+        // Make the loading icon move once
+        HourGlass();
+
         if (LIVE_RENDER == 1)
         {
-            // Force display VRAM (kinda dodgy command - be careful)
-            Bdisp_PutDisp_DD();
-        } 
+            // Force display VRAM strip
+            Bdisp_PutDisp_DD_stripe(y, y);
+        }
     }
 
     if (LIVE_RENDER == 0)
@@ -378,7 +411,7 @@ void setTrace()
             cy--;
             tmpcol = Bdisp_GetPoint_VRAM(cx, cy);
             Bdisp_SetPoint_VRAM(cx, cy, 0xf800);
-            Bdisp_PutDisp_DD();
+            Bdisp_PutDisp_DD_stripe(cy, cy + 1);
         }
 
         // If right move cursor right
@@ -388,7 +421,7 @@ void setTrace()
             cx++;
             tmpcol = Bdisp_GetPoint_VRAM(cx, cy);
             Bdisp_SetPoint_VRAM(cx, cy, 0xf800);
-            Bdisp_PutDisp_DD();
+            Bdisp_PutDisp_DD_stripe(cy, cy);
         }
 
         // If down move cursor down
@@ -398,7 +431,7 @@ void setTrace()
             cy++;
             tmpcol = Bdisp_GetPoint_VRAM(cx, cy);
             Bdisp_SetPoint_VRAM(cx, cy, 0xf800);
-            Bdisp_PutDisp_DD();
+            Bdisp_PutDisp_DD_stripe(cy - 1, cy);
         }
 
         // If left move cursor left
@@ -408,7 +441,7 @@ void setTrace()
             cx--;
             tmpcol = Bdisp_GetPoint_VRAM(cx, cy);
             Bdisp_SetPoint_VRAM(cx, cy, 0xf800);
-            Bdisp_PutDisp_DD();
+            Bdisp_PutDisp_DD_stripe(cy, cy);
         }
 
         // If exe, draw trace
@@ -481,6 +514,11 @@ void drawTrace(unsigned int x, unsigned int y)
 
             return;
         }
+
+        else if (key == 0x7532)
+        {
+            main();
+        }
     }
 }
 
@@ -548,6 +586,14 @@ void main(void)
     // Bypass 3 bit 8 colour mode
     Bdisp_EnableColor(ADVANCED_COLOUR);
 
+    // Setup header
+    char color1 = TEXT_COLOR_WHITE;
+    char color2 = TEXT_COLOR_WHITE;
+    char msg[5] = "Menu";
+    DefineStatusMessage(&msg[0], 0, TEXT_COLOR_BLACK, 0);
+    DefineStatusAreaFlags(4, SAF_BATTERY | SAF_TEXT | SAF_ALPHA_SHIFT, &color1, &color2);
+    EnableDisplayHeader(2, 2);
+
     PrintXY(1, 1, "  F1: Mandelbrot", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
     PrintXY(1, 8, "  F6: Settings ->", TEXT_MODE_NORMAL, TEXT_COLOR_BLACK);
 
@@ -555,7 +601,7 @@ void main(void)
     {
         GetKey(&key);
 
-        // If key is F1, render mandlebrot
+        // If key is F1, render mandelbrot
         if (key == 0x7539)
         {
             renderMandlebrot();
